@@ -1,0 +1,55 @@
+/* CSS Document */
+body {
+    font:14px georgia;
+    color: #222;
+    text-align:center;
+    border:25px;
+    padding:25px;
+    padding-top:0px;
+}
+  
+form, p, span {
+    margin:0;
+    padding:0;}
+  
+input { font:14px georgia;}
+  
+a { color:#0000AF;
+    text-decoration:none;}
+#header {
+    height:50px;
+    text-align:center;
+    background-color:white;
+}
+
+#chat_room {
+    margin:0 auto;
+    background:rgb(255, 255, 166);
+    border-radius:7px;
+    height:450px;
+    width:800px;
+    overflow:auto;
+    box-shadow: 0 0 10px #888888;}
+
+#chat_text {
+    text-align:left;
+}
+
+#search {
+    text-align:center;
+}
+
+#new_message_form {
+    padding-top:4px;
+    display:inline-block;
+    text-align:top;}
+
+#message {
+    padding:5px;
+    width:740px;}
+
+#credits {
+    padding-top:50px; 
+    text-align:bottom;
+    text-align:left;
+    font:8px georgia;}

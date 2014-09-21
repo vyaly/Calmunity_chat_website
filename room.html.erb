@@ -1,0 +1,86 @@
+<head>
+<title>Calmunity</title>
+<link type="text/css" rel="stylesheet" href="ChatboxStyle.css" />
+</head>
+
+<body>
+<div id = "header">
+    <img id="logo" src="Logo.jpg" height="40" width="150" />
+    <br/>
+</div>
+<script>
+$(function() {
+    // Create a new client to connect to Faye
+    var client = new Faye.Client('http://localhost:9292/faye');
+    var roomId = null;
+    client.disable('websocket');
+    var search_subscription = null;
+    var chat_subscription = null;
+    $('#search').click(function() {
+        // assumed that the user is already not in a chat already
+        $('#chat_room').text('Searching for somebody');
+        search_subscription = client.subscribe('/search/' + '<%= session[:username] %>', function(roomInfo) {
+            roomId = roomInfo.send;
+            console.log('assigning roomId to: ' + roomId);
+            $('#chat_room').text("Hey we found somebody!");
+            chat_subscription = client.subscribe(roomInfo.recv, function(data) {
+                $('<p></p>').html("Stranger: " + data).appendTo('#chat_room');
+            });
+            search_subscription.cancel();
+        });
+    });
+
+    $('#stopsearch').click(function() {
+        search_subscription.cancel();
+    });
+
+    $('#clearbtn').click(function() {
+        $('#chat_room').text('');
+    });
+
+    $('#quitbtn').click(function() {
+        chat_subscription.cancel();
+        client.publish(roomId, "The other person has left.");
+        roomId = null;
+    });
+
+    // Handle form submissions and post messages to faye
+    $('#new_message_form').submit(function(){
+      // Publish the message to the public channel
+      msg = $('#message').val();
+        client.publish(roomId, msg);
+        console.log("publishing to " + roomId)
+        $('<p></p>').html("You: " + msg).appendTo('#chat_room'); 
+        $('#message').val('');
+        return false;
+    });
+
+      // Clear the message box
+
+    $('#debug').click(function() {
+        console.log(roomId);
+    });
+
+
+  });
+</script>
+
+<div class="chat_container">
+  <div id="chat_room">
+</div>
+
+<form id="new_message_form">
+    <input name="message" type="text" id="message" margin-top= "1em" />
+    <input name="submitmsg" type="image" id="submitmsg" align="top" src="NewSend.jpg" alt="Submit" value="Submit" width="60" height="36" onmouseover="this.src = 'Send.jpg'" onmouseout="this.src = 'NewSend.jpg'"/>
+    <input id="quitbtn" type="button" value="Quit">
+    <input id="clearbtn" type="button" value="Clear">
+    <input id="search" type="button" value="Start Search">
+    <input id="stop_search" type="button" value="Stop Search">
+    <input id="debug" type="button" value="debug info">
+</form>
+</div>
+
+<div id="credits">
+    <p> Created by Devin He, Steve Wang, Vy Ly, Lostinthewoodz and Mr. Ken 2014. </p>
+</div>
+</body>

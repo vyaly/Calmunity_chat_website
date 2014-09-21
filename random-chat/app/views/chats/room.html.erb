@@ -1,0 +1,69 @@
+<link type="text/css" rel="stylesheet" href="assets/stylesheets/ChatboxStyle.css" />
+<script src='http://randomcalfaye.herokuapp.com/faye.js'></script>
+
+<div id = "header">
+    <img id="logo" src="Logo.jpg" height="40" width="150" />
+    <br/>
+</div>
+
+<script>
+$(function() {
+    // Create a new client to connect to Faye
+    var client = new Faye.Client('http://randomcalfaye.herokuapp.com/faye');
+    var roomId = null;
+    client.disable('websocket');
+    var search_subscription = null;
+    var chat_subscription = null;
+    $('#search').click(function() {
+        // assumed that the user is already not in a chat already
+        $('#search').toggle();
+        $('#chat_text').text('Searching for somebody');
+        search_subscription = client.subscribe('/search/' + '<%= session[:username] %>', function(roomInfo) {
+            roomId = roomInfo.send;
+            $('#chat_text').text("Yay we found somebody!");
+            chat_subscription = client.subscribe(roomInfo.recv, function(data) {
+                $('<p></p>').html("Stranger: " + data).appendTo('#chat_text');
+            });
+            search_subscription.cancel();
+        });
+    });
+
+
+    $('#clearbtn').click(function() {
+        $('#chat_text').text('');
+    });
+
+    $('#quitbtn').click(function() {
+        chat_subscription.cancel();
+        $('<p></p>').html("You have left").appendTo('#chat_text'); 
+        client.publish(roomId, "The other person has left.");
+        $('#search').toggle();
+        roomId = null;
+    });
+
+    // Handle form submissions and post messages to faye
+    $('#new_message_form').submit(function(){
+      // Publish the message to the public channel
+      msg = $('#message').val();
+        client.publish(roomId, msg);
+        $('<p></p>').html("You: " + msg).appendTo('#chat_text'); 
+        $('#message').val('');
+        return false;
+    });
+  });
+</script>
+
+
+<div class="chat_container">
+  <div id="chat_room">
+    <input name="search" id="search" type="image" src="Search.jpg" alt = "Search" value="Search" width="240" height="144" onmouseover="this.src = 'LightSearch.jpg'" onmouseout="this.src = 'Search.jpg'"/>
+    <div id="chat_text"></div>
+  </div>
+
+<form id="new_message_form">
+    <input name="message" type="text" id="message" margin-top= "1em" />
+    <input name="submitmsg" type="image" id="submitmsg" align="top" src="NewSend.jpg" alt="Submit" value="Submit" width="60" height="36" onmouseover="this.src = 'Send.jpg'" onmouseout="this.src = 'NewSend.jpg'"/>
+    <input name="quitbtn" type="image" id="quitbtn" align="top" src="DarkQuit.jpg" alt="Quit" value="Quit" width="60" height="36" onmouseover="this.src = 'Quit.jpg'" onmouseout="this.src = 'DarkQuit.jpg'"/>
+    <input name="clearbtn" type="image" id="clearbtn" align="top" src="Clear.jpg" alt="Clear" value="Clear" width="60" height="36" onmouseover="this.src = 'LightClear.jpg'" onmouseout="this.src = 'Clear.jpg'"/>
+</form>
+</div>

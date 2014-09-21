@@ -1,0 +1,33 @@
+<div id = "header">
+    <img id="logo" src="Logo.jpg" height="40" width="150" />
+    <br/>
+</div>
+
+<body>
+<div id = "chat_room">
+<h1>Come and join the fun!</h1>
+	<div id = "greysplit">
+		<p> Sign in! </p>
+
+		<%= form_tag login_path do |f| %>
+		    <%= label_tag :email %>
+		    <%= text_field_tag :email %>
+		    <%= label_tag :password %>
+		    <%= text_field_tag :password %>
+		    <%= submit_tag "Enter" %>
+		<% end %>
+	</div>
+
+	<div id = "greysplit">
+		<p> Login! </p>
+
+		<%= form_tag login_path do |f| %>
+		    <%= label_tag :email %>
+		    <%= text_field_tag :email %>
+		    <%= label_tag :password %>
+		    <%= text_field_tag :password %>
+		    <%= submit_tag "Enter" %>
+		<% end %>
+	</div> 
+</div>
+</body>
